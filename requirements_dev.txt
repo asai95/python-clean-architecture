@@ -2,5 +2,6 @@ greenlet==1.0.0
 importlib-metadata==3.10.1
 pydantic==1.8.1
 SQLAlchemy==1.4.9
+sqlalchemy-filters==0.12.0
 typing-extensions==3.7.4.3
 zipp==3.4.1

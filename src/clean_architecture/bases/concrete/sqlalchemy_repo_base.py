@@ -1,7 +1,8 @@
-from typing import Type, Callable, TypeVar, Any, List, Dict
+from typing import Type, Callable, TypeVar, Any, List, Dict, Union
 
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from sqlalchemy_filters import apply_filters, apply_sort, apply_pagination
 
 from clean_architecture.bases.abstract.bases import DomainBase
 from clean_architecture.interfaces import IRepo
@@ -90,3 +91,18 @@ class SqlAlchemyBaseRepo(IRepo):
         if not commit:
             return cls._delete(domain_obj)
         return cls._db_persist(cls._delete, domain_obj)
+
+    @classmethod
+    def query(cls, query: Union[Dict, List[Dict]] = None, sort: Dict = None, pagination: Dict = None):
+        sql_query = cls.orm_model.query
+        if query:
+            sql_query = apply_filters(sql_query, query)
+        if sort:
+            sql_query = apply_sort(sql_query, sort)
+        if pagination:
+            sql_query, _ = apply_pagination(sql_query, **pagination)
+        return [cls.to_domain(x) for x in sql_query.all()]
+
+    @classmethod
+    def count(cls):
+        return cls.orm_model.query.count()
